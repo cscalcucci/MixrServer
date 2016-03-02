@@ -20,13 +20,13 @@ var juiceSchema =  new Schema({
         nicAmount: Number,
         desiredAmount: Number
     },
-    flavors: {
+    flavors: [{
         name: String,
         brand: Number,
         base: Number,
         percent: Number,
         index: Number
-    }
+    }]
 });
 
 module.exports = mongoose.model('Juice', juiceSchema);
