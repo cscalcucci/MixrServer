@@ -5,11 +5,6 @@ var router = express.Router();
 var jwt = require('jsonwebtoken');
 var config = require('../config');
 
-router.route('/')
-    .get(function(req,res) {
-        res.json({ message: 'Welcome to the coolest API on Earth!' });
-    });
-
 router.route('/auth')
     .post(function(req,res) {
         User.findOne({
@@ -32,6 +27,32 @@ router.route('/auth')
                 }
             }
         });
+    });
+
+router.use(function(req,res,next) {
+    // Check header, url params, or post params for token
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+    if (token) {
+        //Verifies secret and checks exp
+        jwt.verify(token, config.secret, function(err, decoded) {
+            if (err) {
+                return res.json({ success: false, message: 'Failed to authenticate token.' });
+            } else {
+                //Save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
+    } else {
+        // If there is no token, return an error
+        return res.status(403).send( { success: false, message: 'No token provded.' });
+    }
+});
+
+router.route('/')
+    .get(function(req,res) {
+        res.json({ message: 'Welcome to the coolest API on Earth!' });
     });
 
 router.route('/users')
