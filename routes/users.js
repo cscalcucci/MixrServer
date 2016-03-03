@@ -2,25 +2,34 @@ var User = require('../models/user');
 var express = require('express');
 var router = express.Router();
 
+var jwt = require('jsonwebtoken');
+
+
 router.route('/')
     .get(function(req,res) {
         res.json({ message: 'Welcome to the coolest API on Earth!' });
     });
 
-router.route('/setup')
-    .get(function(req,res) {
-
-        var chris = new User({
-            name: 'Chris Scalcucci',
-            password: 'password',
-            admin: true
-        });
-
-        chris.save(function(err) {
+router.route('/auth')
+    .post(function(req,res) {
+        User.findOne({
+            name: req.body.name
+        }, function(err,user) {
             if (err) throw err;
 
-            console.log('User saved successfully');
-            res.json({ success: true });
+            if (!user) {
+                res.json({ success: false, message: 'Authentication failed. User not found.' });
+            } else if (user) {
+                if (user.password != req.body.password) {
+                    res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+                } else {
+                    var token = jwt.sign(user, app.get('superSecret') , {
+                        expiresInMinutes: 1440 // Expires in 24 hours
+                    });
+
+                    res.json({ success: true, message: 'Enjoy the token!', token: token });
+                }
+            }
         });
     });
 
