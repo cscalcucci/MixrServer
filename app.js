@@ -40,7 +40,7 @@ db.on('disconnected', connect);
 // =======================
 // Config ================
 // =======================
-app.set('superSecret', config.secret); // Secret variable
+app.set('secret', config.secret); // Secret variable
 app.use(bodyParser.json()); // Configure Body-Parser
 app.use(bodyParser.urlencoded()); // Configure Body-Parser
 app.use(morgan('dev')); // Use morgan to log requests to the console

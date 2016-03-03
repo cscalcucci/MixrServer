@@ -22,11 +22,12 @@ router.route('/auth')
                 if (user.password != req.body.password) {
                     res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                 } else {
-                    // var token = jwt.sign(user, app.get('superSecret') , {
-                    //     expiresInMinutes: 1440 // Expires in 24 hours
-                    // });
+                    /*var token = jwt.sign(user, app.get('superSecret') , {
+                        expiresInMinutes: 1440 // Expires in 24 hours
+                    });*/
+                    var token = jwt.sign(user, app.get('secret'));
 
-                    res.json({ success: true, message: 'Enjoy the token!' });
+                    res.json({ success: true, message: 'Enjoy the token!', token: token });
                 }
             }
         });
