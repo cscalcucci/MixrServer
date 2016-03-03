@@ -27,7 +27,7 @@ router.route('/auth')
                     });*/
                     var token = jwt.sign(user, app.get('secret'));
 
-                    res.json({ success: true, message: 'Enjoy the token!', token: token });
+                    res.json({ success: true, message: 'Enjoy the token!' });
                 }
             }
         });
