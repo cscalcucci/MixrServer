@@ -1,13 +1,21 @@
+// =======================
+// Packages ==============
+// =======================
 var express    = require('express');
 var bodyParser = require('body-parser');
 var mongoose   = require('mongoose');
+var morgan     = require('morgan');
 var juices     = require('./routes/juices'); //routes defined here
+var users      = require('./routes/users'); //routes defined here
 var bson       = require('bson');
 var app        = express();
 
-//var dbName = 'mixrDB';
-//var connectionString = 'mongodb://localhost:27017/' + dbName;
-//mongoose.connect(connectionString);
+var jwt = require('jsonwebtoken');
+var config = require('./config');
+
+// =======================
+// MongoDB Config ========
+// =======================
 var url = '127.0.0.1:27017/' + process.env.OPENSHIFT_APP_NAME;
 
 // If OPENSHIFT env variables are present, use the available connection info:
@@ -29,10 +37,19 @@ db.on('error', function(error){
 
 db.on('disconnected', connect);
 
-// Configure Body-Parser
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+// =======================
+// Config ================
+// =======================
+app.set('superSecret', config.secret); // Secret variable
+app.use(bodyParser.json()); // Configure Body-Parser
+app.use(bodyParser.urlencoded()); // Configure Body-Parser
+app.use(morgan('dev')); // Use morgan to log requests to the console
+
+// =======================
+// Routes ================
+// =======================
 app.use('/api', juices);
+app.use('/api', users);
 // This is our router middleware
 // Path /api passed as first argument to map route middleware to /api
 // API URLs become /api/movies and api/movies/:id
