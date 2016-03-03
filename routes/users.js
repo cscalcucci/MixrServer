@@ -3,7 +3,7 @@ var express = require('express');
 var router = express.Router();
 
 var jwt = require('jsonwebtoken');
-
+var config = require('./config');
 
 router.route('/')
     .get(function(req,res) {
@@ -27,7 +27,7 @@ router.route('/auth')
                         expiresInMinutes: 1440 // Expires in 24 hours
                     });
 
-                    res.json({ success: true, message: 'Enjoy the token!', token: token });
+                    res.json({ success: true, message: 'Enjoy the token!' });
                 }
             }
         });
