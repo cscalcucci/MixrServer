@@ -1,9 +1,9 @@
 var User = require('../models/user');
 var express = require('express');
 var router = express.Router();
-var app = require('../app'); //Require our app
 
 var jwt = require('jsonwebtoken');
+var config = require('../config');
 
 router.route('/')
     .get(function(req,res) {
@@ -23,7 +23,7 @@ router.route('/auth')
                 if (user.password != req.body.password) {
                     res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                 } else {
-                    var token = jwt.sign(user, app.get('secret') , {
+                    var token = jwt.sign(user, config.secret, {
                         expiresInMinutes: 1440 // Expires in 24 hours
                     });
                     // var token = jwt.sign(user, app.get('secret'));
