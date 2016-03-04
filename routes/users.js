@@ -18,10 +18,10 @@ router.route('/auth')
                 if (user.password != req.body.password) {
                     res.json({ success: false, message: 'Authentication failed. Wrong password.' });
                 } else {
-                    var token = jwt.sign(user, config.secret, {
+                    var tempUser = { userName: user.userName, admin: user.admin };
+                    var token = jwt.sign(tempUser, config.secret, {
                         expiresInMinutes: 1440 // Expires in 24 hours
                     });
-                    // var token = jwt.sign(user, app.get('secret'));
 
                     res.json({ success: true, message: 'Enjoy the token!', token: token });
                 }
@@ -37,7 +37,13 @@ router.use(function(req,res,next) {
         //Verifies secret and checks exp
         jwt.verify(token, config.secret, function(err, decoded) {
             if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
+                if (err.name == "TokenExpiredError") {
+                    return res.status(400).json({ error: "Token Expired" });
+                } else if (err.name == "JsonWebTokenError") {
+                    return res.status(401).json({ error: "Invalid Token" });
+                } else {
+                    return res.json({ success: false, message: 'Failed to authenticate token.' });
+                }
             } else {
                 //Save to request for use in other routes
                 req.decoded = decoded;
@@ -55,6 +61,7 @@ router.route('/')
         res.json({ message: 'Welcome to the coolest API on Earth!' });
     });
 
+// Send x-access-token through header with token value, or /api/users?token=ENTERTOKENHERE
 router.route('/users')
     .get(function(req,res) {
         User.find({}, function(err, users) {
